@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Page Title</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+  <script src='main.js'></script>
+</head>
+<body>
+  <h1>Weather App</h1>
+  <div>
+      <label for="city">Enter city name:</label>
+      <input type="text" id="city" placeholder="City">
+      <button onclick="fetchWeather()">Get Weather</button>
+      <button onclick="fetchWeatherByLocation()">Use Current Location</button>
+  </div>
+
+  <div id="weather-details" style="display:none;">
+      <h2>City: <span id="city-name"></span></h2>
+      <p>Temperature: <span id="temperature"></span> °F</p>
+      <p>Min Temperature: <span id="min-temp"></span> °F</p>
+      <p>Max Temperature: <span id="max-temp"></span> °F</p>
+      <p>Pressure: <span id="pressure"></span> hPa</p>
+  </div>
+
+  <script>
+      const apiKey = 'e325994e4ea8227c519ce93a1f8ad955';  
+
+      function fetchWeather() {
+          const city = document.getElementById('city').value;
+          if (!city) {
+              alert('Please enter a city name');
+              return;
+          }
+
+          const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+
+          fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                  displayWeather(data);
+              })
+              .catch(error => {
+                  alert('Error fetching weather data: ' + error);
+              });
+      }
+
+      function fetchWeatherByLocation() {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(position => {
+                  const lat = position.coords.latitude;
+                  const lon = position.coords.longitude;
+                  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+
+                  fetch(url)
+                      .then(response => response.json())
+                      .then(data => {
+                          displayWeather(data);
+                      })
+                      .catch(error => {
+                          alert('Error fetching weather data: ' + error);
+                      });
+              }, error => {
+                  alert('Unable to retrieve location. Error: ' + error.message);
+              });
+          } else {
+              alert('Geolocation is not supported by this browser.');
+          }
+      }
+
+      function displayWeather(data) {
+          document.getElementById('city-name').textContent = data.name;
+          document.getElementById('temperature').textContent = data.main.temp;
+          document.getElementById('min-temp').textContent = data.main.temp_min;
+          document.getElementById('max-temp').textContent = data.main.temp_max;
+          document.getElementById('pressure').textContent = data.main.pressure;
+          document.getElementById('weather-details').style.display = 'block';
+
+          const apiKey = 'e325994e4ea8227c519ce93a1f8ad955';
+      }
+      
+  </script>
+</body>
+</html>
